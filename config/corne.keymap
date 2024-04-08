@@ -3,9 +3,9 @@
 #include <dt-bindings/zmk/bt.h>
 
 #define HOST_OS 2  // set to 2 for macOS/Windows-Alt-Codes, default is 0 (Windows)
-#include "../zmk-nodefree-config/helper.h"
-#include "../zmk-nodefree-config/keypos_42keys.h"
-#include "../zmk-nodefree-config/international_chars/swedish.dtsi"
+#include "zmk-nodefree-config/helper.h"
+#include "zmk-nodefree-config/keypos_42keys.h"
+#include "zmk-nodefree-config/international_chars/swedish.dtsi"
 
 #define XXX &none
 #define ___ &trans
