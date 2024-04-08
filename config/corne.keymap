@@ -81,6 +81,15 @@ ZMK_BEHAVIOR(mt_end,  hold_tap,  bindings = <&masked_end>, <&kp>; MT_CORE)
 #define NAV_BSPC  &mt LC(BSPC) BSPC    // tap: bspc  | long-tap: delete word backward
 #define NAV_DEL   &mt LC(DEL)  DEL     // tap: del   | long-tap: delete word forward
 
+// mask CTRL when holding left/right to avoid accidental jumps to beginning/end of document
+#define MASK_MODS(NAME, MODS, BINDING) \
+    ZMK_BEHAVIOR(NAME, mod_morph, \
+        bindings = <BINDING>, <BINDING>; \
+        mods = <MODS>; \
+    )
+MASK_MODS(masked_home, (MOD_LCTL), &kp HOME)
+MASK_MODS(masked_end,  (MOD_LCTL), &kp END)
+
 ZMK_LAYER(base,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
          ___          &kp Q         &kp W         &kp E         &kp R         &kp T             &kp Y         &kp U         &kp I         &kp O         &kp P       &kp LBKT
@@ -97,7 +106,7 @@ ZMK_LAYER(nav,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
          ___           ___           ___           ___           ___           ___               ___           ___           ___           ___           ___           ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___        &sk LGUI      &sk LALT      &sk LCTRL     &sk LSHFT        ___             &kp LEFT      &kp DOWN      &kp UP       &kp RIGHT        ___           ___
+         ___        &sk LGUI      &sk LALT      &sk LCTRL     &sk LSHFT        ___             NAV_LEFT      NAV_DOWN       NAV_UP      NAV_RIGHT        ___           ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
          ___           ___           ___           ___           ___           ___               ___           ___           ___           ___           ___           ___
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
