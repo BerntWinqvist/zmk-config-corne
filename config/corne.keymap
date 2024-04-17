@@ -5,7 +5,15 @@
 #define HOST_OS 2  // set to 2 for macOS/Windows-Alt-Codes, default is 0 (Windows)
 #include "../zmk-nodefree-config/helper.h"
 #include "../zmk-nodefree-config/keypos_def/keypos_42keys.h"
-#include "../zmk-nodefree-config/international_chars/swedish.dtsi"
+// #include "../zmk-nodefree-config/international_chars/swedish.dtsi"
+#include "keys_sv.h"
+
+// To flash new firmware:
+// 1. push to GH action
+// 2. download firmware and unzip
+// 3. plug in one keyboard half at a time
+// 4. Put it in bootloader mode (double klick reset-button)
+// 5. drag firmware to attached keyboard-"drive"
 
 
 #define DEF 0  // layer shortcuts, must match order in which they are defined below
@@ -92,9 +100,9 @@ MASK_MODS(masked_end,  (MOD_LCTL), &kp END)
 
 ZMK_LAYER(base,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
-         ___          &kp Q         &kp W         &kp E         &kp R         &kp T             &kp Y         &kp U         &kp I         &kp O         &kp P         &sv_ao
+         ___          &kp Q         &kp W         &kp E         &kp R         &kp T             &kp Y         &kp U         &kp I         &kp O         &kp P        &kp AO
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___      &hml LCTRL A   &hml LALT S   &hml LGUI D   &hml LSHFT F     &kp G             &kp H     &hmr RSHFT J   &hmr RGUI K  &hmr RALT L       &sv_oe        &sv_ae
+         ___      &hml LCTRL A   &hml LALT S   &hml LGUI D   &hml LSHFT F     &kp G             &kp H     &hmr RSHFT J   &hmr RGUI K  &hmr RALT L   &hmr RCTRL OE    &kp AE
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
          ___          &kp Z         &kp X         &kp C         &kp V         &kp B             &kp N         &kp M       &kp COMMA      &kp DOT       &kp FSLH      ___
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
