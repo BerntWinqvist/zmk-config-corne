@@ -17,8 +17,9 @@
 
 
 #define DEF 0  // layer shortcuts, must match order in which they are defined below
-#define NAV 1
-#define NUM 2
+#define COLEMAK 1
+#define NAV 2
+#define NUM 3
 
 #define XXX &none
 #define ___ &trans
@@ -111,7 +112,7 @@ MASK_MODS(masked_end,  (MOD_LCTL), &kp END)
 //)
 
 // Colemak mod-DH
-ZMK_LAYER(base,
+ZMK_LAYER(colemak,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
          ___          &kp Q         &kp W         &kp F         &kp B         &kp P             &kp J         &kp L         &kp U         &kp Y       &kp SQT          ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
