@@ -2,7 +2,6 @@
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
 
-
 #include "zmk-helpers/helper.h"
 #include "zmk-helpers/key-labels/42.h"
 #include "keys_sv.h"
@@ -14,8 +13,7 @@
 // 4. Put it in bootloader mode (double click reset-button)
 // 5. drag firmware to attached keyboard-"drive"
 
-// DEFINE DEF 0
-#define BASE 0  // layer shortcuts, must match order in which they are defined below
+#define DEF 0  // layer shortcuts, must match order in which they are defined below
 #define NAV 1
 #define SYM 2
 #define NUM 3
@@ -28,7 +26,7 @@
 #define QUICK_TAP_MS 175
 
 &sk {  // sticky-key config
-    release-after-ms = <900>;  // release after 0.6s
+    release-after-ms = <900>;  // release after 0.9s
     quick-release;             // no double capitalization when rolling keys
 };
 
@@ -49,7 +47,7 @@
 #define THUMBS LH2 LH1 LH0 RH0 RH1 RH2                                      // thumbs
 
 #define MAKE_HRM(NAME, HOLD, TAP, TRIGGER_POS) \
-    ZMK_BEHAVIOR(NAME, hold_tap, \
+    ZMK_HOLD_TAP(NAME, \
         flavor = "balanced"; \
         tapping-term-ms = <280>; \
         quick-tap-ms = <QUICK_TAP_MS>; \
@@ -79,8 +77,8 @@ ZMK_BEHAVIOR(smart_shft, mod_morph,
     hold-trigger-key-positions = <0>;
 
 &mt { MT_CORE };
-ZMK_BEHAVIOR(mt_home, hold_tap, bindings = <&masked_home>, <&kp>; MT_CORE)
-ZMK_BEHAVIOR(mt_end,  hold_tap,  bindings = <&masked_end>, <&kp>; MT_CORE)
+ZMK_HOLD_TAP(mt_home, bindings = <&masked_home>, <&kp>; MT_CORE)
+ZMK_HOLD_TAP(mt_end, bindings = <&masked_end>, <&kp>; MT_CORE)
 
 #define NAV_LEFT  &mt_home 0   LEFT    // tap: left  | long-tap: beginning of line
 #define NAV_RIGHT &mt_end 0    RIGHT   // tap: right | long-tap: end       of line
@@ -91,23 +89,49 @@ ZMK_BEHAVIOR(mt_end,  hold_tap,  bindings = <&masked_end>, <&kp>; MT_CORE)
 
 // mask CTRL when holding left/right to avoid accidental jumps to beginning/end of document
 #define MASK_MODS(NAME, MODS, BINDING) \
-    ZMK_BEHAVIOR(NAME, mod_morph, \
+    ZMK_MOD_MORPH(NAME, \
         bindings = <BINDING>, <BINDING>; \
         mods = <MODS>; \
     )
 MASK_MODS(masked_home, (MOD_LCTL), &kp HOME)
 MASK_MODS(masked_end,  (MOD_LCTL), &kp END)
 
+// tap: num-word | double-tap: sticky num-layer | hold: num-layer
+#define SMART_NUM &smart_num NUM 0
+ZMK_HOLD_TAP(smart_num,
+    flavor = "balanced";
+    tapping-term-ms = <200>;
+    quick-tap-ms = <QUICK_TAP_MS>;
+    bindings = <&mo>, <&num_dance>;
+)
+ZMK_TAP_DANCE(num_dance,
+    tapping-term-ms = <200>;
+    bindings = <&num_word NUM>, <&sl NUM>;  // reverse this for sticky-num on single tap
+)
 
-ZMK_LAYER(base,
+// reuse basic mod-morph scheme
+#define SIMPLE_MORPH(NAME, MOD, BINDING1, BINDING2) \
+    ZMK_MOD_MORPH(NAME, \
+        mods = <(MOD_L ## MOD|MOD_R ## MOD)>; \
+        bindings = <BINDING1>, <BINDING2>; \
+    )
+
+// tap: qmark | shift + tap: excl
+SIMPLE_MORPH(qexcl, SFT, &kp QUEST, &kp SV_EXCL)
+
+// tap: apostrophe | shift + tap: quote
+SIMPLE_MORPH(quotes, SFT, &kp SV_SQT, &kp SV_DQT)
+
+
+ZMK_LAYER(def,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
-         ___          &kp Q         &kp W         &kp F         &kp P         &kp B             &kp J         &kp L         &kp U         &kp Y       &kp SEMI          ___
+         ___          &kp Q         &kp W         &kp F         &kp P         &kp B             &kp J         &kp L         &kp U         &kp Y        &quotes          ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
          ___      &hml LCTRL A   &hml LALT R   &hml LGUI S   &hml LSHFT T     &kp G             &kp M     &hmr RSHFT N   &hmr RGUI E   &hmr RALT I   &hmr RCTRL O       ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___       &mt LG(Z) Z   &mt LG(X) X   &mt LG(C) C    &lt SYM D    &mt LG(V) V          &kp K         &kp H       &kp COMMA      &kp DOT      &kp FSLH         ___
+         ___       &mt LG(Z) Z   &mt LG(X) X   &mt LG(C) C    &lt SYM D    &mt LG(V) V          &kp K         &kp H       &kp COMMA      &kp DOT       &qexcl           ___
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
-                                                &kp ESC     &lt NAV SPACE    &kp TAB           &kp RET       &mo NUM      &kp BSPC
+                                                &kp ESC     &lt NAV SPACE    &kp TAB           &kp RET      SMART_NUM      &kp BSPC
 //                                           ╰─────────────┴──── ────────┴─────────────╯   ╰─────────────┴─────────────┴─────────────╯
 )
 
