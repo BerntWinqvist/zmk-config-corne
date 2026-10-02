@@ -5,7 +5,7 @@
 
 #include "zmk-helpers/helper.h"
 #include "zmk-helpers/key-labels/42.h"
-#include "keys_sv.h"
+#include "keys_sv_mac.h"  // OS input source: macOS "Swedish - Pro"
 
 // To flash new firmware:
 // 1. push to GH action
@@ -13,11 +13,13 @@
 // 3. plug in one keyboard half at a time
 // 4. Put it in bootloader mode (double click reset-button)
 // 5. drag firmware to attached keyboard-"drive"
+// 6. In ZMK Studio: "Restore stock settings", otherwise saved Studio edits override this file
 
 #define DEF 0  // layer shortcuts, must match order in which they are defined below
 #define NAV 1
 #define SYM 2
 #define NUM 3
+#define SYS 4
 
 #define XXX &none
 #define ___ &trans
@@ -41,6 +43,10 @@
     quick-tap-ms = <QUICK_TAP_MS>;
 };
 
+&caps_word {  // keep caps-word going through Swedish _ and -
+    continue-list = <SV_UNDER SV_MINUS BSPC DEL>;
+};
+
 /* Homerow mods */
 
 #define KEYS_L LT0 LT1 LT2 LT3 LT4 LM0 LM1 LM2 LM3 LM4 LB0 LB1 LB2 LB3 LB4  // left hand
@@ -60,14 +66,6 @@
 MAKE_HRM(hml, &kp, &kp, KEYS_R THUMBS)  // left-hand HRMs
 MAKE_HRM(hmr, &kp, &kp, KEYS_L THUMBS)  // right-hand HRMs
 
-/* Caps-word, num-word and smart-mouse */
-
-// tap: sticky-shift | shift + tap/ double-tap: caps-word | hold: shift
-ZMK_BEHAVIOR(smart_shft, mod_morph,
-    bindings = <&sk LSHFT>, <&caps_word>;
-    mods = <(MOD_LSFT)>;
-)
-
 /* Nav cluster */
 
 // long-tap action on hold, short-tap action on all interrupts
@@ -85,8 +83,6 @@ ZMK_HOLD_TAP(mt_end, bindings = <&masked_end>, <&kp>; MT_CORE)
 #define NAV_RIGHT &mt_end 0    RIGHT   // tap: right | long-tap: end       of line
 #define NAV_UP    &mt LC(HOME) UP      // tap: up    | long-tap: beginning of document
 #define NAV_DOWN  &mt LC(END)  DOWN    // tap: down  | long-tap: end       of document
-#define NAV_BSPC  &mt LC(BSPC) BSPC    // tap: bspc  | long-tap: delete word backward
-#define NAV_DEL   &mt LC(DEL)  DEL     // tap: del   | long-tap: delete word forward
 
 // mask CTRL when holding left/right to avoid accidental jumps to beginning/end of document
 #define MASK_MODS(NAME, MODS, BINDING) \
@@ -96,6 +92,16 @@ ZMK_HOLD_TAP(mt_end, bindings = <&masked_end>, <&kp>; MT_CORE)
     )
 MASK_MODS(masked_home, (MOD_LCTL), &kp HOME)
 MASK_MODS(masked_end,  (MOD_LCTL), &kp END)
+
+/* Clipboard (macOS) */
+
+#define UNDO  &kp LG(Z)
+#define CUT   &kp LG(X)
+#define COPY  &kp LG(C)
+#define PASTE &kp LG(V)
+#define REDO  &kp LG(LS(Z))
+
+/* Num-word */
 
 // tap: num-word | double-tap: sticky num-layer | hold: num-layer
 #define SMART_NUM &smart_num NUM 0
@@ -110,39 +116,65 @@ ZMK_TAP_DANCE(num_dance,
     bindings = <&num_word NUM>, <&sl NUM>;  // reverse this for sticky-num on single tap
 )
 
-// reuse basic mod-morph scheme
+/* Punctuation with custom shift */
+
 #define SIMPLE_MORPH(NAME, MOD, BINDING1, BINDING2) \
     ZMK_MOD_MORPH(NAME, \
         mods = <(MOD_L ## MOD|MOD_R ## MOD)>; \
         bindings = <BINDING1>, <BINDING2>; \
     )
 
-// tap: qmark | shift + tap: excl
-SIMPLE_MORPH(qexcl, SFT, &kp QUEST, &kp SV_EXCL)
+SIMPLE_MORPH(comma_q,   SFT, &kp COMMA,   &kp SV_QMARK)  // ,  shift: ?
+SIMPLE_MORPH(dot_excl,  SFT, &kp DOT,     &kp SV_EXCL)   // .  shift: !
+SIMPLE_MORPH(semi_col,  SFT, &kp SV_SEMI, &kp SV_COLON)  // ;  shift: :
+SIMPLE_MORPH(quotes,    SFT, &kp SV_SQT,  &kp SV_DQT)    // '  shift: "
 
-// tap: apostrophe | shift + tap: quote
-SIMPLE_MORPH(quotes, SFT, &kp SV_SQT, &kp SV_DQT)
+// ~ is a dead key on Swedish - Pro, so send it followed by space
+ZMK_MACRO(sv_tilde,
+    wait-ms = <0>;
+    tap-ms = <10>;
+    bindings = <&macro_tap &kp SV_TILDE_DEAD &kp SPACE>;
+)
 
+/* macOS function-row actions */
+
+#define MISSION   &kp LC(UP)          // Mission Control
+#define SPOTLIGHT &kp LG(SPACE)
+#define SCRNSHOT  &kp LG(LS(N5))      // screenshot / recording tool
+#define LOCK      &kp LC(LG(Q))       // lock screen
+
+/* Combos: å ä ö (vertical pairs, right hand) and caps-word */
+
+ZMK_COMBO(ao,       &kp SV_AO,  RT2 RM2, DEF)  // o + a       -> å
+ZMK_COMBO(ae,       &kp SV_AE,  RM2 RB2, DEF)  // a + '       -> ä
+ZMK_COMBO(oe,       &kp SV_OE,  RM3 RB3, DEF)  // e + ;       -> ö
+ZMK_COMBO(capsword, &caps_word, LM0 RM0, DEF)  // g + p       -> caps word
+
+/* Holding Nav (Space) + Sym (Enter) together opens the system layer */
+
+ZMK_CONDITIONAL_LAYER(sys, NAV SYM, SYS)
+
+/* Layers - Gallium */
 
 ZMK_LAYER(def,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
-         ___          &kp Q         &kp W         &kp F         &kp P         &kp B             &kp J         &kp L         &kp U         &kp Y        &quotes          ___
+         XXX          &kp B         &kp L         &kp D         &kp C         &kp V             &kp J         &kp Y         &kp O         &kp U        &comma_q         XXX
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___      &hml LCTRL A   &hml LALT R   &hml LGUI S   &hml LSHFT T     &kp G             &kp M     &hmr RSHFT N   &hmr RGUI E   &hmr RALT I   &hmr RCTRL O       ___
+         XXX      &hml LCTRL N   &hml LALT R   &hml LGUI T   &hml LSHFT S     &kp G             &kp P     &hmr RSHFT H   &hmr RGUI A   &hmr RALT E   &hmr RCTRL I       XXX
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___       &mt LG(Z) Z   &mt LG(X) X   &mt LG(C) C    &lt SYM D    &mt LG(V) V          &kp K         &kp H       &kp COMMA      &kp DOT       &qexcl           ___
+         XXX       &mt LG(Z) X   &mt LG(X) Q   &mt LG(C) M      &kp W      &mt LG(V) Z          &kp K         &kp F        &quotes      &semi_col     &dot_excl        XXX
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
-                                                &kp ESC     &lt NAV SPACE    &kp TAB           &kp RET      SMART_NUM      &kp BSPC
+                                                &kp ESC     &lt NAV SPACE    &kp TAB         &lt SYM RET     &kp BSPC      SMART_NUM
 //                                           ╰─────────────┴──── ────────┴─────────────╯   ╰─────────────┴─────────────┴─────────────╯
 )
 
 ZMK_LAYER(nav,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
-      &bt BT_CLR       ___           ___           ___           ___           ___               ___           ___           ___           ___           ___           ___
+         ___           ___           ___           ___           ___           ___               ___           ___           ___           ___           ___           ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
          ___        &sk LCTRL      &sk LALT      &sk LGUI     &sk LSHFT        ___             NAV_LEFT      NAV_DOWN       NAV_UP      NAV_RIGHT        ___           ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-    &studio_unlock     ___           ___           ___           ___           ___               ___           ___           ___           ___           ___           ___
+         ___           UNDO          CUT           COPY          REDO          PASTE             ___           ___           ___           ___           ___           ___
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
                                                    ___           ___           ___               ___           ___           ___
 //                                           ╰─────────────┴──── ────────┴─────────────╯   ╰─────────────┴─────────────┴─────────────╯
@@ -150,11 +182,11 @@ ZMK_LAYER(nav,
 
 ZMK_LAYER(sym,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
-         ___           ___           ___           ___           ___           ___            &kp PIPE       &kp AMPS     &kp LBKT      &kp RBKT         ___           ___
+         ___        &kp SV_GRAVE   &kp SV_AT    &kp SV_HASH   &kp SV_DLLR    &sv_tilde         &kp SV_PIPE   &kp SV_AMPS   &kp SV_LBKT   &kp SV_RBKT   &kp SV_PRCT      ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___           ___           ___           ___           ___           ___            &kp QUEST      &kp COL      &kp LPAR      &kp RPAR         ___           ___
+         ___        &kp SV_STAR    &kp SV_EQL   &kp SV_MINUS   &kp SV_GT     &kp SV_FSLH       &kp SV_QMARK  &kp SV_COLON  &kp SV_LPAR   &kp SV_RPAR   &kp SV_SEMI      ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___           ___           ___           ___           ___           ___               ___        &kp DLLR      &kp LBRC      &kp RBRC         ___           ___
+         ___        &kp SV_CARET   &kp SV_PLUS  &kp SV_EXCL    &kp SV_LT     &kp SV_BSLH       &kp SV_UNDER  &kp SV_DLLR   &kp SV_LBRC   &kp SV_RBRC   &kp SV_EURO      ___
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
                                                    ___           ___           ___               ___           ___           ___
 //                                           ╰─────────────┴──── ────────┴─────────────╯   ╰─────────────┴─────────────┴─────────────╯
@@ -169,5 +201,17 @@ ZMK_LAYER(num,
          ___           ___           ___           ___           ___           ___             &kp N0        &kp N1        &kp N2        &kp N3         ___           ___
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
                                                    ___           ___           ___             &kp RET         ___         &kp DOT
+//                                           ╰─────────────┴──── ────────┴─────────────╯   ╰─────────────┴─────────────┴─────────────╯
+)
+
+ZMK_LAYER(sys,
+// ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
+         ___      &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3       ___              SCRNSHOT    &kp C_BRI_DN  &kp C_BRI_UP     MISSION      SPOTLIGHT        ___
+// ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
+         ___           ___           ___           ___           ___           ___               ___        &kp C_PREV     &kp C_PP     &kp C_NEXT       LOCK           ___
+// ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
+         ___       &bt BT_CLR   &studio_unlock     ___           ___       &bootloader         &bootloader  &kp C_MUTE  &kp C_VOL_DN  &kp C_VOL_UP       ___           ___
+// ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
+                                                   ___           ___           ___               ___           ___           ___
 //                                           ╰─────────────┴──── ────────┴─────────────╯   ╰─────────────┴─────────────┴─────────────╯
 )
