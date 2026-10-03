@@ -1,0 +1,15 @@
+# keymap-drawer config. Regenerate keymap.svg with:
+#   git clone https://github.com/urob/zmk-helpers.git zmk-helpers   (once; gitignored)
+#   keymap -c keymap_drawer.config.yaml parse -z config/corne.keymap -c 10 > /tmp/kd.yaml
+#   keymap -c keymap_drawer.config.yaml draw /tmp/kd.yaml > keymap.svg
+parse_config:
+  zmk_additional_includes: ["zmk-helpers/include"]
+  raw_binding_map: {"&caps_word": "Caps word", "&studio_unlock": "Studio unlock", "&bootloader": "Boot loader", "&kp LBKT": "å", "&kp SQT": "ä", "&kp SEMI": "ö", "&kp LS(N1)": "!", "&kp LS(N2)": "\"", "&kp LA(N2)": "@", "&kp LS(N3)": "#", "&kp LS(N4)": "€", "&kp LA(N4)": "$", "&kp LS(N5)": "%", "&kp LS(N6)": "&", "&kp LS(N7)": "/", "&kp LA(N7)": "|", "&kp LS(LA(N7))": "\\", "&kp LS(N8)": "(", "&kp LA(N8)": "[", "&kp LS(LA(N8))": "{", "&kp LS(N9)": ")", "&kp LA(N9)": "]", "&kp LS(LA(N9))": "}", "&kp LS(N0)": "=", "&kp MINUS": "+", "&kp LS(MINUS)": "?", "&kp LS(LA(EQUAL))": "`", "&kp LS(LA(RBKT))": "^", "&kp BSLH": "'", "&kp LS(BSLH)": "*", "&kp LS(COMMA)": ";", "&kp LS(DOT)": ":", "&kp FSLH": "-", "&kp LS(FSLH)": "_", "&kp NUBS": "<", "&kp LS(NUBS)": ">", "&comma_q": {"t": ",", "s": "?"}, "&dot_excl": {"t": ".", "s": "!"}, "&semi_col": {"t": ";", "s": ":"}, "&quotes": {"t": "'", "s": "\""}, "&sv_tilde": "~", "&mt LG(LEFT) LEFT": {"t": "←", "h": "⌘← line"}, "&mt LG(RIGHT) RIGHT": {"t": "→", "h": "⌘→ line"}, "&mt LG(UP) UP": {"t": "↑", "h": "⌘↑ top"}, "&mt LG(DOWN) DOWN": {"t": "↓", "h": "⌘↓ end"}, "&kp LA(LEFT)": "⌥← word", "&kp LA(RIGHT)": "⌥→ word", "&kp LA(BSPC)": "⌥⌫ word", "&kp LA(DEL)": "⌥⌦ word", "&kp LG(Z)": "Undo", "&kp LG(X)": "Cut", "&kp LG(C)": "Copy", "&kp LG(V)": "Paste", "&kp LG(LS(Z))": "Redo", "&mt LG(Z) X": {"t": "X", "h": "Undo"}, "&mt LG(X) Q": {"t": "Q", "h": "Cut"}, "&mt LG(C) M": {"t": "M", "h": "Copy"}, "&mt LG(V) Z": {"t": "Z", "h": "Paste"}, "&kp LC(UP)": "Mission Ctl", "&kp LG(SPACE)": "Spotlight", "&kp LG(LS(N5))": "Screenshot", "&kp LC(LG(Q))": "Lock", "&smart_num NUM 0": {"t": "Num-word", "h": "Num"}, "&lt SYM RET": {"t": "⏎", "h": "Sym"}, "&lt NAV SPACE": {"t": "␣", "h": "Nav"}}
+  sticky_label: "sticky"
+  zmk_keycode_map: {LCTRL: "⌃", RCTRL: "⌃", LALT: "⌥", RALT: "⌥", LGUI: "⌘", RGUI: "⌘", LSHFT: "⇧", RSHFT: "⇧", BSPC: "⌫", ESC: "Esc", TAB: "⇥", RET: "⏎", PG_UP: "PgUp", PG_DN: "PgDn", C_PREV: "⏮", C_PP: "⏯", C_NEXT: "⏭", C_MUTE: "Mute", C_VOL_DN: "Vol−", C_VOL_UP: "Vol+", C_BRI_DN: "Bri−", C_BRI_UP: "Bri+", DOT: ".", COMMA: ","}
+draw_config:
+  key_w: 64
+  key_h: 52
+  combo_w: 26
+  combo_h: 20
+  separate_combo_diagrams: false

@@ -47,6 +47,10 @@
     continue-list = <SV_UNDER SV_MINUS BSPC DEL>;
 };
 
+&num_word {  // Swedish codes; = / ( ) are shifted number keys and continue anyway
+    continue-list = <BSPC DEL DOT COMMA SV_PLUS SV_MINUS SV_STAR>;
+};
+
 /* Homerow mods */
 
 #define KEYS_L LT0 LT1 LT2 LT3 LT4 LM0 LM1 LM2 LM3 LM4 LB0 LB1 LB2 LB3 LB4  // left hand
@@ -66,32 +70,24 @@
 MAKE_HRM(hml, &kp, &kp, KEYS_R THUMBS)  // left-hand HRMs
 MAKE_HRM(hmr, &kp, &kp, KEYS_L THUMBS)  // right-hand HRMs
 
-/* Nav cluster */
+/* Nav cluster (macOS) */
 
 // long-tap action on hold, short-tap action on all interrupts
-#define MT_CORE \
-    flavor = "tap-preferred"; \
-    tapping-term-ms = <220>; \
-    quick-tap-ms = <220>; \
+&mt {
+    flavor = "tap-preferred";
+    tapping-term-ms = <220>;
+    quick-tap-ms = <220>;
     hold-trigger-key-positions = <0>;
+};
 
-&mt { MT_CORE };
-ZMK_HOLD_TAP(mt_home, bindings = <&masked_home>, <&kp>; MT_CORE)
-ZMK_HOLD_TAP(mt_end, bindings = <&masked_end>, <&kp>; MT_CORE)
-
-#define NAV_LEFT  &mt_home 0   LEFT    // tap: left  | long-tap: beginning of line
-#define NAV_RIGHT &mt_end 0    RIGHT   // tap: right | long-tap: end       of line
-#define NAV_UP    &mt LC(HOME) UP      // tap: up    | long-tap: beginning of document
-#define NAV_DOWN  &mt LC(END)  DOWN    // tap: down  | long-tap: end       of document
-
-// mask CTRL when holding left/right to avoid accidental jumps to beginning/end of document
-#define MASK_MODS(NAME, MODS, BINDING) \
-    ZMK_MOD_MORPH(NAME, \
-        bindings = <BINDING>, <BINDING>; \
-        mods = <MODS>; \
-    )
-MASK_MODS(masked_home, (MOD_LCTL), &kp HOME)
-MASK_MODS(masked_end,  (MOD_LCTL), &kp END)
+#define NAV_LEFT  &mt LG(LEFT)  LEFT   // tap: left  | long-tap: beginning of line
+#define NAV_RIGHT &mt LG(RIGHT) RIGHT  // tap: right | long-tap: end       of line
+#define NAV_UP    &mt LG(UP)    UP     // tap: up    | long-tap: beginning of document
+#define NAV_DOWN  &mt LG(DOWN)  DOWN   // tap: down  | long-tap: end       of document
+#define WORD_L    &kp LA(LEFT)         // previous word
+#define WORD_R    &kp LA(RIGHT)        // next word
+#define DEL_WORD  &kp LA(BSPC)         // delete word backward
+#define DEL_WORDF &kp LA(DEL)          // delete word forward
 
 /* Clipboard (macOS) */
 
@@ -170,37 +166,37 @@ ZMK_LAYER(def,
 
 ZMK_LAYER(nav,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
-         ___           ___           ___           ___           ___           ___               ___           ___           ___           ___           ___           ___
+        ___           ___           ___           ___           ___           ___           DEL_WORD      &kp PG_DN     &kp PG_UP     DEL_WORDF        ___           ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___        &sk LCTRL      &sk LALT      &sk LGUI     &sk LSHFT        ___             NAV_LEFT      NAV_DOWN       NAV_UP      NAV_RIGHT        ___           ___
+        ___        &sk LCTRL      &sk LALT      &sk LGUI     &sk LSHFT        ___           NAV_LEFT      NAV_DOWN       NAV_UP      NAV_RIGHT        ___           ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___           UNDO          CUT           COPY          REDO          PASTE             ___           ___           ___           ___           ___           ___
+        ___           UNDO          CUT           COPY          REDO         PASTE           WORD_L         ___           ___          WORD_R         ___           ___
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
-                                                   ___           ___           ___               ___           ___           ___
+                                                  ___           ___           ___             ___           ___           ___
 //                                           ╰─────────────┴──── ────────┴─────────────╯   ╰─────────────┴─────────────┴─────────────╯
 )
 
 ZMK_LAYER(sym,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
-         ___        &kp SV_GRAVE   &kp SV_AT    &kp SV_HASH   &kp SV_DLLR    &sv_tilde         &kp SV_PIPE   &kp SV_AMPS   &kp SV_LBKT   &kp SV_RBKT   &kp SV_PRCT      ___
+        ___       &kp SV_GRAVE   &kp SV_AT    &kp SV_HASH   &kp SV_DLLR    &sv_tilde      &kp SV_PIPE   &kp SV_LBKT   &kp SV_RBKT   &kp SV_AMPS   &kp SV_QMARK      ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___        &kp SV_STAR    &kp SV_EQL   &kp SV_MINUS   &kp SV_GT     &kp SV_FSLH       &kp SV_QMARK  &kp SV_COLON  &kp SV_LPAR   &kp SV_RPAR   &kp SV_SEMI      ___
+        ___       &kp SV_STAR    &kp SV_EQL   &kp SV_MINUS   &kp SV_GT    &kp SV_FSLH     &kp SV_SEMI   &kp SV_COLON  &kp SV_LPAR   &kp SV_RPAR    &kp SV_SQT       ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___        &kp SV_CARET   &kp SV_PLUS  &kp SV_EXCL    &kp SV_LT     &kp SV_BSLH       &kp SV_UNDER  &kp SV_DLLR   &kp SV_LBRC   &kp SV_RBRC   &kp SV_EURO      ___
+        ___       &kp SV_CARET  &kp SV_PLUS   &kp SV_LBRC   &kp SV_RBRC   &kp SV_BSLH     &kp SV_UNDER   &kp SV_LT    &kp SV_PRCT   &kp SV_EXCL   &kp SV_EURO       ___
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
-                                                   ___           ___           ___               ___           ___           ___
+                                                  ___           ___           ___             ___           ___           ___
 //                                           ╰─────────────┴──── ────────┴─────────────╯   ╰─────────────┴─────────────┴─────────────╯
 )
 
 ZMK_LAYER(num,
 // ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮   ╭─────────────┬─────────────┬─────────────┬─────────────┬─────────────┬─────────────╮
-         ___           ___           ___           ___           ___           ___               ___         &kp N7        &kp N8        &kp N9         ___           ___
+        ___           ___           ___           ___           ___           ___             ___          &kp N7        &kp N8        &kp N9         ___           ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___        &sk LCTRL      &sk LALT      &sk LGUI     &sk LSHFT        ___               ___         &kp N4        &kp N5        &kp N6         ___           ___
+        ___       &kp SV_STAR    &kp SV_EQL   &kp SV_MINUS    &kp DOT     &kp SV_FSLH         ___          &kp N4        &kp N5        &kp N6         ___           ___
 // ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤   ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤
-         ___           ___           ___           ___           ___           ___             &kp N0        &kp N1        &kp N2        &kp N3         ___           ___
+        ___           ___       &kp SV_PLUS    &kp COMMA    &kp SV_COLON      ___            &kp N0        &kp N1        &kp N2        &kp N3         ___           ___
 // ╰─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤─────────────┤   ├─────────────┼─────────────┼─────────────┴─────────────┴─────────────┴─────────────╯
-                                                   ___           ___           ___             &kp RET         ___         &kp DOT
+                                                  ___           ___           ___           &kp RET         ___         &kp DOT
 //                                           ╰─────────────┴──── ────────┴─────────────╯   ╰─────────────┴─────────────┴─────────────╯
 )
 
