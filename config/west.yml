@@ -1,50 +1,35 @@
-# This file specifies the build dependencies for Github Action workflows and
-# for local build environments. The workspace has three toplevel directories
-# containing the user config, user modules and ZMK. Zephyr and its dependencies
-# are namespaced under /zmk to keep the toplevel clean.
+# Build dependencies for GitHub Actions and local builds.
 #
-# ZMK-Workspace
-# ├── config
-# ├── modules (user modules)
-# └── zmk
-#     └── modules (Zephyr modules)
+# ZMK is pinned to an upstream main commit (Zephyr 4.1) together with urob's
+# modules at commits known to work with it, matching the set used in
+# https://github.com/urob/zmk-config. To update, copy the revisions from
+# urob's config/west.yml (and keep build.yml's workflow ref in sync), or
+# switch to `revision: v0.4` once ZMK releases it.
 #
-# To create a local build environment, clone this repository and then run the
-# following commands from its toplevel directory:
-#
-# $ west init -l config
-# $ west update
-# $ west zephyr-export
-#
+# Local build environment:
+#   west init -l config && west update && west zephyr-export
 ---
 manifest:
-  defaults:
-    remote: urob
-    revision: main
-
   remotes:
-    - name: upstream
+    - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
     - name: urob
       url-base: https://github.com/urob
 
   projects:
-    - name: zmk-auto-layer
-      path: modules/auto-layer
-    - name: zmk-helpers
-      path: modules/helpers
-    - name: zmk-leader-key
-      path: modules/leader-key
-    - name: zmk-tri-state
-      path: modules/tri-state
-
-    # ZMK with Zephyr namespaced under /zmk. This requires that ZMK imports
-    # Zephyr with a path other than `zephyr` (as in `going-modular`).
     - name: zmk
-      path: .
-      import:
-        file: app/west.yml
-        path-prefix: zmk
+      remote: zmkfirmware
+      revision: 641514a97db345f499dd50b0360e594270f008fe # main (2026-08-31)
+      import: app/west.yml
+
+    - name: zmk-auto-layer  # num-word
+      remote: urob
+      revision: 62c201934711369d50a28df12e1d055d05cb6460 # main (2026-08-18)
+      path: modules/zmk/auto-layer
+    - name: zmk-helpers     # ZMK_LAYER, ZMK_COMBO, key labels, ...
+      remote: urob
+      revision: 95edb8f15ef1d1bd8332810555f8cf5837fbdd27 # main (2026-08-31)
+      path: modules/zmk/helpers
 
   self:
     path: config

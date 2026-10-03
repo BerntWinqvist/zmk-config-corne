@@ -13,10 +13,10 @@
 #
 ---
 include:
-  - board: nice_nano_v2
+  - board: nice_nano//zmk  # nice!nano v2 (was nice_nano_v2 before Zephyr 4.1)
     shield: corne_left
     snippet: studio-rpc-usb-uart
-  - board: nice_nano_v2
+  - board: nice_nano//zmk
     shield: corne_right
-#  - board: nice_nano_v2
+#  - board: nice_nano//zmk
 #    shield: settings_reset
